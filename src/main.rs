@@ -6,6 +6,10 @@ use chrono::prelude::*;
 use yew::prelude::*;
 use yew::services::console::ConsoleService;
 
+mod map;
+
+use map::{Cell, Map};
+
 struct Context {
     console: ConsoleService,
 }
@@ -13,6 +17,7 @@ struct Context {
 struct Model {
     list: Vec<String>,
     text_value: String,
+    map: Map,
 }
 
 #[derive(Debug)]
@@ -30,6 +35,7 @@ impl Component<Context> for Model {
         Model {
             list: vec![],
             text_value: String::new(),
+            map: Map::new(8, 8),
         }
     }
 
@@ -61,6 +67,8 @@ impl Renderable<Context, Model> for Model {
                 <hr />
                 { self.text_input() }
                 { self.render_list() }
+                <hr />
+                { self.render_map() }
             </div>
         }
     }
@@ -76,7 +84,6 @@ impl Model {
                        if e.key == "Enter" { Msg::Add } else { Msg::Nope }
                    },
             />
-
         }
     }
     fn render_list(&self) -> Html<Context, Self> {
@@ -86,9 +93,32 @@ impl Model {
             </ul>
         }
     }
+
+    fn render_map(&self) -> Html<Context, Self> {
+        let render_map_elem = |cell: &Cell| match *cell {
+            Cell::Empty => {
+                html!{ <td class=("gray-cell", "clickable"), />}
+            }
+            Cell::Black => html!{ <td class="black-cell" ,></td> },
+            Cell::White => html!{ <td class="white-cell" ,></td> },
+        };
+
+        html!{
+            <table>
+                { for self.map.inner_map.iter().map(|column :&Vec<Cell>| {
+                    html!{
+                        <tr>
+                            { for column.iter().map(|cell| render_map_elem(cell)) }
+                        </tr>
+                    }
+                  }) 
+                }
+            </table>
+        }
+    }
 }
 
-fn view_list_elem((index, elem): (usize, &String)) -> Html<Context, Model> {
+fn view_list_elem((_, elem): (usize, &String)) -> Html<Context, Model> {
     html!{
         <li>{ elem }</li>
     }

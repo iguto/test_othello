@@ -1,0 +1,24 @@
+table {
+    border: none;
+}
+
+table td {
+    border: 1px black solid;
+    width: 40px;
+    height: 40px;
+}
+
+table td.black-cell{
+    background-color: black;
+}
+
+table td.white-cell {
+    background-color: white;
+}
+
+table td.gray-cell {
+    background-color: rgb(190, 189, 189);
+}
+table td.clickable:hover { 
+    background-color: #ffff61
+}
