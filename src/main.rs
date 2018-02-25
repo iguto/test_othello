@@ -7,8 +7,8 @@ use yew::prelude::*;
 use yew::services::console::ConsoleService;
 
 mod map;
-
-use map::{Cell, Map};
+ 
+use map::{Cell, CellColors, Map};
 
 struct Context {
     console: ConsoleService,
@@ -18,6 +18,7 @@ struct Model {
     list: Vec<String>,
     text_value: String,
     map: Map,
+    turn: CellColors,
 }
 
 #[derive(Debug)]
@@ -36,6 +37,7 @@ impl Component<Context> for Model {
             list: vec![],
             text_value: String::new(),
             map: Map::new(8, 8),
+            turn: CellColors::Black,
         }
     }
 
@@ -95,17 +97,25 @@ impl Model {
     }
 
     fn render_map(&self) -> Html<Context, Self> {
-        let render_map_elem = |cell: &Cell| match *cell {
-            Cell::Empty => {
-                html!{ <td class=("gray-cell", "clickable"), />}
+        let render_map_elem = |cell: &Cell| { 
+            let handle_click = |cell: &Cell| {
+                // |_: MouseData| cell.put(self.turn)
+            };
+            match cell.color {
+                CellColors::Empty => {
+                    html!{
+                        <td class=("gray-cell", "clickable"), 
+                        />
+                    }
+                }
+                CellColors::Black => html!{ <td class="black-cell" ,></td> },
+                CellColors::White => html!{ <td class="white-cell" ,></td> },
             }
-            Cell::Black => html!{ <td class="black-cell" ,></td> },
-            Cell::White => html!{ <td class="white-cell" ,></td> },
         };
 
         html!{
             <table>
-                { for self.map.inner_map.iter().map(|column :&Vec<Cell>| {
+                { for self.map.inner_map.iter().map(|column| {
                     html!{
                         <tr>
                             { for column.iter().map(|cell| render_map_elem(cell)) }

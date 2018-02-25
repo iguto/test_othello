@@ -1,43 +1,57 @@
 use std::fmt;
 
+const BOARD_SIZE: usize = 8;
+
 pub struct Map {
     pub col_size: usize,
     pub row_size: usize,
-    pub inner_map: Vec<Vec<Cell>>,
+    pub inner_map: [[Cell; BOARD_SIZE]; BOARD_SIZE],
 }
 
 impl Map {
     pub fn new(row_size: usize, col_size: usize) -> Self {
-        let mut vecs = vec![vec![Cell::Empty; col_size]; row_size];
-        vecs[3][3] = Cell::Black;
-        vecs[4][4] = Cell::Black;
-        vecs[3][4] = Cell::White;
-        vecs[4][3] = Cell::White;
+        let cell = Cell {
+            column: 0,
+            row: 0,
+            color: CellColors::Empty,
+        };
+        let mut board = [[cell.clone(); BOARD_SIZE]; BOARD_SIZE];
+        board[3][3].color = CellColors::Black;
+        board[4][4].color = CellColors::Black;
+        board[3][4].color = CellColors::White;
+        board[4][3].color = CellColors::White;
         Map {
             row_size,
             col_size,
-            inner_map: vecs,
+            inner_map: board,
         }
     }
 }
 
-#[derive(Clone)]
-pub enum Cell {
+#[derive(Clone, Copy)]
+pub enum CellColors {
     Empty,
-    Black,
     White,
+    Black,
+}
+
+#[derive(Clone, Copy)]
+pub struct Cell {
+    pub column: usize,
+    pub row: usize,
+    pub color: CellColors,
 }
 
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Cell::Empty | Cell::Black | Cell::White => write!(f, " "),
+        match self.color {
+            CellColors::Empty | CellColors::Black | CellColors::White => write!(f, " "),
         }
     }
 }
 
 impl Cell {
-    pub fn put(&mut self, target: Cell) {
-        *self = target.clone();
+    pub fn put(&mut self, target: CellColors) {
+        self.color = target;
     }
 }
