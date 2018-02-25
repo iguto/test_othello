@@ -26,7 +26,7 @@ enum Msg {
     Add,
     EditInput(String),
     Nope,
-    Hand(usize, usize)
+    Hand(usize, usize),
 }
 
 impl Component<Context> for Model {
@@ -59,8 +59,8 @@ impl Component<Context> for Model {
             Msg::Hand(row, column) => {
                 self.map.put_hand(row, column, self.player);
                 println!("in hand row:{} column:{}", row, column);
-
-            }
+                self.switch_player();
+            },
             Msg::Nope => (),
         }
         true
@@ -108,9 +108,8 @@ impl Model {
             match cell.color { 
                 CellColors::Empty => { 
                     html!{
-                        <td class=("gray-cell", "clickable"),  
-                            onclick=move |_: MouseData| Msg::Hand(c.row, c.column)
-                            ,
+                        <td class=("gray-cell", "clickable"),
+                            onclick=move |_: MouseData| Msg::Hand(c.row, c.column),
                         />
                     }
                 }
@@ -130,6 +129,14 @@ impl Model {
                   }) 
                 }
             </table>
+        }
+    }
+
+    fn switch_player(&mut self) {
+        self.player = match self.player {
+            CellColors::White => CellColors::Black,
+            CellColors::Black => CellColors::White,
+            CellColors::Empty => unreachable!(),
         }
     }
 }
