@@ -26,6 +26,7 @@ enum Msg {
     Add,
     EditInput(String),
     Nope,
+    Hand(usize, usize)
 }
 
 impl Component<Context> for Model {
@@ -54,6 +55,10 @@ impl Component<Context> for Model {
             }
             Msg::EditInput(text) => {
                 self.text_value = text;
+            },
+            Msg::Hand(row, column) => {
+                self.map.put_hand(row, column, self.turn);
+                println!("in hand row:{} column:{}", row, column)
             }
             Msg::Nope => (),
         }
@@ -98,13 +103,16 @@ impl Model {
 
     fn render_map(&self) -> Html<Context, Self> {
         let render_map_elem = |cell: &Cell| { 
-            let handle_click = |cell: &Cell| {
-                // |_: MouseData| cell.put(self.turn)
-            };
-            match cell.color {
-                CellColors::Empty => {
+            // let handle_click = |cell: &Cell| {
+            //     move |_: MouseData| Msg::Hand(cell.row, cell.column)
+            // };
+            let c = cell.clone();
+            match cell.color { 
+                CellColors::Empty => { 
                     html!{
-                        <td class=("gray-cell", "clickable"), 
+                        <td class=("gray-cell", "clickable"),  
+                            onclick=move |_: MouseData| Msg::Hand(c.row, c.column)
+                            ,
                         />
                     }
                 }
@@ -133,6 +141,10 @@ fn view_list_elem((_, elem): (usize, &String)) -> Html<Context, Model> {
         <li>{ elem }</li>
     }
 }
+
+// fn handle_click_fn(cell: &Cell) -> Msg {
+//     Msg::Hand(cell.row, cell.column)
+// }
 
 fn main() {
     yew::initialize();

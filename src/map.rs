@@ -26,6 +26,10 @@ impl Map {
             inner_map: board,
         }
     }
+
+    pub fn put_hand(&mut self, row: usize, column: usize, player: CellColors) {
+        self.inner_map[row][column].color = player;
+    }
 }
 
 #[derive(Clone, Copy)]
