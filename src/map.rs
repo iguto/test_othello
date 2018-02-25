@@ -16,6 +16,12 @@ impl Map {
             color: CellColors::Empty,
         };
         let mut board = [[cell.clone(); BOARD_SIZE]; BOARD_SIZE];
+        for (row, column_cells) in board.iter_mut().enumerate() {
+            let row = row.clone();
+            for (column, cell) in column_cells.iter_mut().enumerate() {
+                cell.set_position(row, column);
+            }
+        }
         board[3][3].color = CellColors::Black;
         board[4][4].color = CellColors::Black;
         board[3][4].color = CellColors::White;
@@ -51,5 +57,12 @@ impl fmt::Display for Cell {
         match self.color {
             CellColors::Empty | CellColors::Black | CellColors::White => write!(f, " "),
         }
+    }
+}
+
+impl Cell {
+    fn set_position(&mut self, row: usize, column: usize) {
+        self.row = row;
+        self.column = column;
     }
 }
