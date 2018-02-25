@@ -103,9 +103,6 @@ impl Model {
 
     fn render_map(&self) -> Html<Context, Self> {
         let render_map_elem = |cell: &Cell| { 
-            // let handle_click = |cell: &Cell| {
-            //     move |_: MouseData| Msg::Hand(cell.row, cell.column)
-            // };
             let c = cell.clone();
             match cell.color { 
                 CellColors::Empty => { 
@@ -141,10 +138,6 @@ fn view_list_elem((_, elem): (usize, &String)) -> Html<Context, Model> {
         <li>{ elem }</li>
     }
 }
-
-// fn handle_click_fn(cell: &Cell) -> Msg {
-//     Msg::Hand(cell.row, cell.column)
-// }
 
 fn main() {
     yew::initialize();
