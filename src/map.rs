@@ -53,9 +53,3 @@ impl fmt::Display for Cell {
         }
     }
 }
-
-impl Cell {
-    pub fn put(&mut self, target: CellColors) {
-        self.color = target;
-    }
-}
