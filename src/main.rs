@@ -18,7 +18,7 @@ struct Model {
     list: Vec<String>,
     text_value: String,
     map: Map,
-    turn: CellColors,
+    player: CellColors,
 }
 
 #[derive(Debug)]
@@ -38,7 +38,7 @@ impl Component<Context> for Model {
             list: vec![],
             text_value: String::new(),
             map: Map::new(8, 8),
-            turn: CellColors::Black,
+            player: CellColors::Black,
         }
     }
 
@@ -57,8 +57,9 @@ impl Component<Context> for Model {
                 self.text_value = text;
             },
             Msg::Hand(row, column) => {
-                self.map.put_hand(row, column, self.turn);
-                println!("in hand row:{} column:{}", row, column)
+                self.map.put_hand(row, column, self.player);
+                println!("in hand row:{} column:{}", row, column);
+
             }
             Msg::Nope => (),
         }
