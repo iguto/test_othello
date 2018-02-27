@@ -8,7 +8,7 @@ use yew::services::console::ConsoleService;
 
 mod map;
  
-use map::{Cell, CellColors, Map};
+use map::{Cell, CellColors, Map, Coordinate};
 
 struct Context {
     console: ConsoleService,
@@ -106,13 +106,14 @@ impl Model {
         let render_map_elem = |cell: &Cell| { 
             let c = cell.clone();
             match cell.color { 
-                CellColors::Empty => { 
+                CellColors::Empty if self.is_reversible(Coordinate(cell.row, cell.column), self.player) => { 
                     html!{
                         <td class=("gray-cell", "clickable"),
                             onclick=move |_: MouseData| Msg::Hand(c.row, c.column),
                         />
                     }
-                }
+                },
+                CellColors::Empty => html!{ <td class="gray-cell", ></td> },
                 CellColors::Black => html!{ <td class="black-cell" ,></td> },
                 CellColors::White => html!{ <td class="white-cell" ,></td> },
             }
@@ -129,6 +130,46 @@ impl Model {
                   }) 
                 }
             </table>
+        }
+    }
+
+    fn is_reversible(&self, cursor: Coordinate, player: CellColors) -> bool {
+        // self.map.inner_map[row][column]
+        let dirs: [(i64, i64); 8] = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)];
+        for dir in dirs.iter() {
+            if self.is_reversible_dir(cursor, player, *dir) {
+                return true
+            }
+        }
+        false
+    }
+
+    fn is_reversible_dir(&self, cursor: Coordinate, player: CellColors, dir: (i64, i64)) -> bool {
+        let mut cursor = cursor.clone();
+        let mut reversible_count = 0;
+
+        loop {
+            cursor = match cursor.next(dir) {
+                Some(coord) => coord,
+                None => return false,
+            };
+
+            let cell_color = self.map.inner_map[cursor.0][cursor.1].color;
+            match player {
+                CellColors::Black => { 
+                    match cell_color {
+                        CellColors::White => reversible_count += 1,
+                        CellColors::Black if reversible_count > 0 => return true,
+                        _ => return false,
+                    }
+                },
+                CellColors::White => match cell_color {
+                    CellColors::Black => reversible_count += 1,
+                    CellColors::White if reversible_count > 0 => return true,
+                    _ => return false,
+                },
+                _ => return false,
+            };
         }
     }
 

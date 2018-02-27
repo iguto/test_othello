@@ -3,19 +3,28 @@ use std::fmt;
 const BOARD_SIZE: usize = 8;
 type Board = [[Cell; BOARD_SIZE]; BOARD_SIZE];
 
+#[derive(Clone, Copy, Debug)]
+pub struct Coordinate(pub usize, pub usize);
+
 pub struct Map {
     pub col_size: usize,
     pub row_size: usize,
     pub inner_map: Board,
 }
 
+impl Coordinate {
+    pub fn next(&self, other: (i64, i64)) -> Option<Coordinate> {
+        let row = other.0 + (self.0 as i64);
+        let column = other.1 + (self.1 as i64);
+        if row < 0 || column < 0 || row >= BOARD_SIZE as i64 || column >= BOARD_SIZE as i64 {
+            return None;
+        }
+        Some(Coordinate(row as usize, column as usize))
+    }
+}
+
 impl Map {
     pub fn new(row_size: usize, col_size: usize) -> Self {
-        let cell = Cell {
-            column: 0,
-            row: 0,
-            color: CellColors::Empty,
-        };
         let board = Self::setup_board();
         Map {
             row_size,
@@ -55,7 +64,7 @@ impl Map {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum CellColors {
     Empty,
     White,
