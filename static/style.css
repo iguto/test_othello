@@ -1,3 +1,7 @@
+body {
+    background-color: rgb(235, 235, 235);
+}
+
 table {
     border: none;
 }
@@ -19,6 +23,27 @@ table td.white-cell {
 table td.gray-cell {
     background-color: rgb(190, 189, 189);
 }
+
 table td.clickable:hover { 
     background-color: #ffff61
+}
+
+div.player-indicator-container {
+    padding-bottom: 7px;
+    padding-left: 10px;
+}
+
+span.player-indicator {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    outline: black 1px solid;
+}
+
+span.player-indicator.player-black {
+    background-color: black;
+}
+
+span.player-indicator.player-white {
+    background-color: white;
 }

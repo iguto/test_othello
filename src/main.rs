@@ -1,30 +1,24 @@
-extern crate chrono;
 #[macro_use]
 extern crate yew;
 
-use chrono::prelude::*;
 use yew::prelude::*;
 use yew::services::console::ConsoleService;
 
 mod map;
- 
-use map::{Cell, CellColors, Map, Coordinate};
+
+use map::{Cell, CellColors, Coordinate, Map};
 
 struct Context {
     console: ConsoleService,
 }
 
 struct Model {
-    list: Vec<String>,
-    text_value: String,
     map: Map,
     player: CellColors,
 }
 
 #[derive(Debug)]
 enum Msg {
-    Add,
-    EditInput(String),
     Nope,
     Hand(usize, usize),
 }
@@ -35,8 +29,6 @@ impl Component<Context> for Model {
 
     fn create(_: Self::Properties, _: &mut Env<Context, Self>) -> Self {
         Model {
-            list: vec![],
-            text_value: String::new(),
             map: Map::new(8, 8),
             player: CellColors::Black,
         }
@@ -45,22 +37,11 @@ impl Component<Context> for Model {
     fn update(&mut self, msg: Self::Msg, context: &mut Env<Context, Self>) -> ShouldRender {
         println!("msg: {:?}", msg);
         match msg {
-            Msg::Add => {
-                if self.text_value.is_empty() {
-                    return false;
-                }
-                let text = self.text_value.clone();
-                self.list.push(text);
-                self.text_value.clear();
-            }
-            Msg::EditInput(text) => {
-                self.text_value = text;
-            },
             Msg::Hand(row, column) => {
                 self.map.put_hand(row, column, self.player);
                 println!("in hand row:{} column:{}", row, column);
                 self.switch_player();
-            },
+            }
             Msg::Nope => (),
         }
         true
@@ -71,11 +52,7 @@ impl Renderable<Context, Model> for Model {
     fn view(&self) -> Html<Context, Self> {
         html! {
             <div>
-                <p>{ Local::now() }</p>
-                <hr />
-                { self.text_input() }
-                { self.render_list() }
-                <hr />
+                { self.render_player_indicator() }
                 { self.render_map() }
             </div>
         }
@@ -83,34 +60,18 @@ impl Renderable<Context, Model> for Model {
 }
 
 impl Model {
-    fn text_input(&self) -> Html<Context, Self> {
-        html! {
-            <input type="text",
-                   value=&self.text_value,
-                   oninput=|e: InputData| Msg::EditInput(e.value),
-                   onkeypress=move |e: KeyData| {
-                       if e.key == "Enter" { Msg::Add } else { Msg::Nope }
-                   },
-            />
-        }
-    }
-    fn render_list(&self) -> Html<Context, Self> {
-        html!{
-            <ul>
-                { for self.list.iter().enumerate().map(view_list_elem) }
-            </ul>
-        }
-    }
-
     fn render_map(&self) -> Html<Context, Self> {
-        let render_map_elem = |cell: &Cell| { 
+        let render_map_elem = |cell: &Cell| {
             let c = cell.clone();
-            match cell.color { 
-                CellColors::Empty if self.map.is_reversible(Coordinate(cell.row, cell.column), self.player) => { 
+            match cell.color {
+                CellColors::Empty
+                    if self.map
+                        .is_reversible(Coordinate(cell.row, cell.column), self.player) =>
+                {
                     html!{
                         <td class=("gray-cell", "clickable"), onclick=move |_: MouseData| Msg::Hand(c.row, c.column), />
                     }
-                },
+                }
                 CellColors::Empty => html!{ <td class="gray-cell", ></td> },
                 CellColors::Black => html!{ <td class="black-cell" ,></td> },
                 CellColors::White => html!{ <td class="white-cell" ,></td> },
@@ -123,12 +84,34 @@ impl Model {
                     <tr>
                         { for column.iter().map(|cell| render_map_elem(cell)) }
                     </tr>
-                } 
+                }
             })}</table>
         }
     }
 
-
+    fn render_player_indicator(&self) -> Html<Context, Self> {
+        html! {
+            <div class="player-indicator-container", >
+                <span>{ "player:" }</span>
+                <span class=("player-indicator", {
+                    match self.player {
+                        CellColors::Black => "player-black",
+                        CellColors::White => "player-white",
+                        _ => "",
+                    }
+                }),></span>
+            </div>
+        }
+        // match self.player {
+        //     CellColors::Black => html!{
+        //         <p>player: <div class=("player-indicator", "player-black"),></div></p>
+        //     },
+        //     CellColors::White => html!{
+        //         <p>player: <div class=("player-indicator", "player-white"),></div></p>
+        //     },
+        //     _ => unreachable!(),
+        // }
+    }
 
     fn switch_player(&mut self) {
         self.player = match self.player {
@@ -136,13 +119,6 @@ impl Model {
             CellColors::Black => CellColors::White,
             CellColors::Empty => unreachable!(),
         }
-    }
-
-}
-
-fn view_list_elem((_, elem): (usize, &String)) -> Html<Context, Model> {
-    html!{
-        <li>{ elem }</li>
     }
 }
 

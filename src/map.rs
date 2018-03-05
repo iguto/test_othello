@@ -103,6 +103,7 @@ impl Map {
             }
         }
     }
+
     pub fn is_reversible(&self, coord: Coordinate, player: CellColors) -> bool {
         for dir in DIRS.iter() {
             if self.is_reversible_dir(coord, player, *dir) {
@@ -181,6 +182,16 @@ pub struct Cell {
     pub column: usize,
     pub row: usize,
     pub color: CellColors,
+}
+
+impl fmt::Display for CellColors {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            CellColors::Black => write!(f, "black"),
+            CellColors::White => write!(f, "white"),
+            CellColors::Empty => write!(f, "empty"),
+        }
+    }
 }
 
 impl fmt::Display for Cell {
